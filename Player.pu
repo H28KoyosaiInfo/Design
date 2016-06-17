@@ -1,0 +1,44 @@
+@startuml
+’event’
+actor 参加者
+actor 通信
+actor カメラ
+
+
+rectangle RasberryPi {
+  usecase 撃つ
+  usecase アイテムをとる
+
+  usecase 撃たれる
+  usecase ミッションを開始する
+  usecase 説明を行う
+  usecase 終了の合図を出す
+
+  usecase 描画する
+  usecase 物を認識する
+}
+
+'link'
+
+参加者->撃つ
+撃つ->通信
+参加者->アイテムをとる
+
+通信->撃たれる
+通信->ミッションを開始する
+通信->説明を行う
+通信->終了の合図を出す
+
+カメラ->描画する
+カメラ->物を認識する
+
+'関係性の追加'
+
+撃つ-.>物を認識する
+アイテムをとる-.>物を認識する
+
+説明を行う-.終了の合図を出す
+
+
+
+@enduml
