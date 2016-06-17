@@ -2,5 +2,22 @@
 title "Root Design"
 'actors
 !include Player.pu
+!include GameServer.pu
+!include Admin.pu
+!include DataServer.pu
+
+!include WebServer.pu
+!include Viewer.pu
+!include Printer.pu
+
+
+
+WebServer -> DataServer
+GameServer ->DataServer
+Admin -> GameServer
+Player -> GameServer
+
+Viewer -> DataServer
+Printer -> DataServer
 
 @enduml

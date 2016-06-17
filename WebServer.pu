@@ -1,0 +1,10 @@
+'作成者 5345kk'
+@startuml
+  rectangle WebServer{
+
+
+
+  }
+
+
+@enduml

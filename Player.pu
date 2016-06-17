@@ -1,11 +1,7 @@
 @startuml
 ’event’
-actor 参加者
-actor 通信
-actor カメラ
 
-
-rectangle RasberryPi {
+rectangle Player{
   usecase 撃つ
   usecase アイテムをとる
 
