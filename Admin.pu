@@ -1,0 +1,18 @@
+'作成者 5345kk'
+@startuml
+  rectangle Admin{
+    usecase 危険行為の判断
+    usecase トラブルの対処
+    usecase クライアント
+
+
+
+
+
+
+  }
+
+クライアント.>GameServer
+トラブルの対処->Player
+危険行為の判断->Player
+@enduml

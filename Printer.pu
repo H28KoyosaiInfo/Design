@@ -1,0 +1,18 @@
+'作成者 5345kk'
+@startuml
+  actor DataServer
+
+  rectangle Printer{
+      usecase 戦績を印刷
+
+
+
+
+  }
+
+'link'
+DataServer->戦績を印刷
+
+
+戦績を印刷->参加者
+@enduml
