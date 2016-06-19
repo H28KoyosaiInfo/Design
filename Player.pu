@@ -1,40 +1,63 @@
 @startuml
-’event’
+'設計者　川上　輝'
 
-rectangle Player{
-  usecase 撃つ
-  usecase アイテムをとる
+'文字方向を指定'
+'left to right direction'
+'イベント要因を列挙'
+actor 参加者 as Player
+actor 通信 as Transmit
+actor カメラ as Camera
+'動作を規定'
+package  RaspberryPi(Player) as Raspi {
+  'ユーザーからのイベント'
+  rectangle 行動管理 as PlayerAction{
+    usecase 撃つ as Hit
+    usecase アイテムをとる as GetItem
+    usecase 撃たれる as GetDamege
+    usecase 状態を表示する as ViewStatus
+  }
 
-  usecase 撃たれる
-  usecase ミッションを開始する
-  usecase 説明を行う
-  usecase 終了の合図を出す
+  rectangle 場面管理 as SceneAction {
+    usecase ミッションを開始する as BeginMission
+    usecase 説明を行う as Introduction
+    usecase 開始の合図を出す as CallStarting
+    usecase 終了の合図を出す as CallEnding
+  }
 
-  usecase 描画する
-  usecase 物を認識する
-}
+  note "場面管理のみを行う" as SceneActionNote
+  'カメラからのイベント'
+  rectangle 画像処理 as CameraAction {
+    usecase 画像を得る as TakePhoto
+    usecase 描画する as Paint
+    usecase 物を認識する as SenseObject
+  }
 
-'link'
+  '通信'
+  rectangle 通信動作 as TransmitAction {
+    usecase 信号を送信する as SendInfo
+    usecase 信号を受け取る as ReceiveInfo
+  }
+  }
+'プレーヤの動作について'
+Player <-right-> PlayerAction :プレーヤの操作をもらう
+PlayerAction -> TransmitAction:プレーヤの行動について
 
-参加者->撃つ
-撃つ->通信
-参加者->アイテムをとる
+SceneAction -> PlayerAction
+SceneAction --> TransmitAction :指示をもらう
+SceneAction .. SceneActionNote
 
-通信->撃たれる
-通信->ミッションを開始する
-通信->説明を行う
-通信->終了の合図を出す
+'AboutSceneAction'
+SceneAction --> Paint
+'AboutCameraAction'
+Paint       --> TakePhoto
+SenseObject --> TakePhoto
+TakePhoto   -> Camera
+'通信動作'
+Transmit <-right-> TransmitAction
 
-カメラ->描画する
-カメラ->物を認識する
-
-'関係性の追加'
-
-撃つ-.>物を認識する
-アイテムをとる-.>物を認識する
-
-説明を行う-.終了の合図を出す
-
+'動作の依存関係を規定'
+'AR系'
+PlayerAction -> CameraAction
 
 
 @enduml
