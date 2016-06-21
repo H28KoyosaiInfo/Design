@@ -6,58 +6,42 @@
 'イベント要因を列挙'
 actor 参加者 as Player
 actor 通信 as Transmit
-actor カメラ as Camera
 '動作を規定'
 package  RaspberryPi(Player) as Raspi {
+  rectangle 場面管理 as SceneAction {
+    rectangle ゲーム状態 as GameStatus{
+      rectangle ゲーム中 as Gaming{
+        [ミッション] as Mission
+        [通常] as Normal
+        Mission <.> Normal
+      }
+      rectangle 準備中 as Standby {
+        [説明] as Introduction
+        [何もしない] as Nothing
+        Introduction<.> Nothing
+      }
+      Gaming <.> Standby
+      }
+      (シーン変更)as ChangeScene
+      ChangeScene -> GameStatus
+      Transmit -> ChangeScene
+  }
   'ユーザーからのイベント'
-  rectangle 行動管理 as PlayerAction{
+  rectangle 行動管理 as GamingAction{
     usecase 撃つ as Hit
     usecase アイテムをとる as GetItem
     usecase 撃たれる as GetDamege
-    usecase 状態を表示する as ViewStatus
   }
+  Gaming .>GamingAction
+  Player ->GamingAction
+  GamingAction -> Transmit
 
-  rectangle 場面管理 as SceneAction {
-    usecase ミッションを開始する as BeginMission
-    usecase 説明を行う as Introduction
-    usecase 開始の合図を出す as CallStarting
-    usecase 終了の合図を出す as CallEnding
-  }
+  usecase 状態を表示する as ViewStatus
 
-  note "場面管理のみを行う" as SceneActionNote
-  'カメラからのイベント'
-  rectangle 画像処理 as CameraAction {
-    usecase 画像を得る as TakePhoto
-    usecase 描画する as Paint
-    usecase 物を認識する as SenseObject
-  }
 
-  '通信'
-  rectangle 通信動作 as TransmitAction {
-    usecase 信号を送信する as SendInfo
-    usecase 信号を受け取る as ReceiveInfo
-  }
+
   }
 'プレーヤの動作について'
-Player <-right-> PlayerAction :プレーヤの操作をもらう
-PlayerAction -> TransmitAction:プレーヤの行動について
-
-SceneAction -> PlayerAction
-SceneAction --> TransmitAction :指示をもらう
-SceneAction .. SceneActionNote
-
-'AboutSceneAction'
-SceneAction --> Paint
-'AboutCameraAction'
-Paint       --> TakePhoto
-SenseObject --> TakePhoto
-TakePhoto   -> Camera
-'通信動作'
-Transmit <-right-> TransmitAction
-
-'動作の依存関係を規定'
-'AR系'
-PlayerAction -> CameraAction
 
 
 @enduml
