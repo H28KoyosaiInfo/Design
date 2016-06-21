@@ -1,10 +1,36 @@
 '作成者 5345kk'
 @startuml
+  actor DataServer
+  actor Player
+  actor Admin
   rectangle GameServer{
+      usecase ヒット数
+      usecase 体力
+      usecase アイテム
+      usecase 当たり判定
+      usecase ゲーム進行指示
+
+
 
 
 
   }
 
+'link'
+Player->ヒット数
+Player->体力
+Player->アイテム
+Player->当たり判定
+
+ヒット数->DataServer
+ヒット数->Viewer
+体力->Viewer
+
+Admin->ゲーム進行指示
+ゲーム進行指示->Player
+
+
+体力->Player
+当たり判定->Player
 
 @enduml

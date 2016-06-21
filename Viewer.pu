@@ -1,10 +1,12 @@
 '作成者 5345kk'
 @startuml
+  actor DataServer
   rectangle Viewer{
-
-
-
+        usecase 結果を表示する
   }
+
+'Link'
+DataServer->結果を表示する
 
 
 @enduml
