@@ -37,9 +37,6 @@ package  RaspberryPi(Player) as Raspi {
   GamingAction -> Transmit
 
   usecase 状態を表示する as ViewStatus
-
-
-
   }
 'プレーヤの動作について'
 
