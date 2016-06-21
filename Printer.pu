@@ -2,8 +2,8 @@
 @startuml
   actor DataServer
 
-  rectangle Printer{
-      usecase 戦績を印刷
+  package Printer{
+      usecase 戦績を印刷 as print
 
 
 
@@ -11,8 +11,7 @@
   }
 
 'link'
-DataServer->戦績を印刷
-
-
-戦績を印刷->参加者
+DataServer<-print
+print->印刷する人
+print<-参加者
 @enduml

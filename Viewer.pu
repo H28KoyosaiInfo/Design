@@ -1,12 +1,14 @@
 '作成者 5345kk'
 @startuml
   actor DataServer
-  rectangle Viewer{
-        usecase 結果を表示する
+  package Viewer{
+        usecase 結果を表示する as result
   }
 
 'Link'
-DataServer->結果を表示する
+DataServer<-result
+参加者->result
+管理者.参加者
 
 
 @enduml

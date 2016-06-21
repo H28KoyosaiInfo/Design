@@ -1,11 +1,21 @@
 '作成者 5345kk'
 @startuml
-  actor "参加者"
 
-  rectangle DataServer{
-      usecase 戦績
+
+  database DataServer as Data{
+
+      rectangle information as info{
       usecase スコア
-      usecase プレーヤー名
+      usecase 体力
+
+    }
+
+      rectangle PlayerInformation as pinfo{
+        usecase プレイヤー名
+        usecase 識別ID
+      }
+
+
 
 
 
@@ -13,11 +23,11 @@
   }
 
 'link'
-参加者->プレーヤー名
-GameServer->スコア
-戦績->Printer
+JoinServer<-pinfo
+GameServer<-info
+Printer->Data
+Viewer->Data
 
 '関連付け'
-スコア.>戦績
-プレーヤー名.>戦績
+
 @enduml

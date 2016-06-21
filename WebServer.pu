@@ -1,14 +1,15 @@
 '作成者 5345kk'
 @startuml
   actor DataServer
-  rectangle WebServer{
-        usecase HTML形式に出力
+  package WebServer{
+        usecase HTML形式に出力 as HTML
 
 
 
   }
 
 'link'
-DataServer->HTML形式に出力
+DataServer<-HTML
+HTML<-参加者
 
 @enduml

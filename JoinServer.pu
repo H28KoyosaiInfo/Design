@@ -1,0 +1,16 @@
+'作成者 5345kk'
+@startuml
+  database "JoinServer" as Join {
+    package PlayerInformation as pinfo{
+      usecase プレイヤー名 as name
+      usecase 識別ID as id
+      usecase バーコード as bcord
+    }
+  }
+
+  'link'
+  name->参加者
+  id.bcord
+  bcord->バーコードリーダー
+  Join<-DataServer
+@enduml

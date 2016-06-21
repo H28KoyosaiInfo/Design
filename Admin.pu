@@ -1,9 +1,14 @@
 '作成者 5345kk'
 @startuml
-  rectangle Admin{
+  package Admin{
     usecase 危険行為の判断
     usecase トラブルの対処
-    usecase クライアント
+    rectangle Game{
+      usecase ゲーム開始の合図
+      usecase ゲーム終了の合図
+    }
+
+
 
 
 
@@ -12,7 +17,8 @@
 
   }
 
-クライアント.>GameServer
-トラブルの対処->Player
-危険行為の判断->Player
+
+トラブルの対処->参加者
+危険行為の判断->参加者
+GameServer<-Game
 @enduml
