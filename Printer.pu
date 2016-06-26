@@ -2,8 +2,13 @@
 @startuml
   actor DataServer
 
+<<<<<<< HEAD
   package Printer{
       usecase 戦績を印刷 as print
+=======
+  rectangle Printer{
+      usecase 戦績を印刷
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 
 
 
@@ -11,7 +16,14 @@
   }
 
 'link'
+<<<<<<< HEAD
 DataServer<-print
 print->印刷する人
 print<-参加者
+=======
+DataServer->戦績を印刷
+
+
+戦績を印刷->参加者
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 @enduml

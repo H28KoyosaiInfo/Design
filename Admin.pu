@@ -9,6 +9,12 @@
     }
 
 
+=======
+  rectangle Admin{
+    usecase 危険行為の判断
+    usecase トラブルの対処
+    usecase クライアント
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 
 
 
@@ -17,8 +23,14 @@
 
   }
 
+<<<<<<< HEAD
 
 トラブルの対処->参加者
 危険行為の判断->参加者
 GameServer<-Game
+=======
+クライアント.>GameServer
+トラブルの対処->Player
+危険行為の判断->Player
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 @enduml

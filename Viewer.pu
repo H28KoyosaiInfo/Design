@@ -1,6 +1,7 @@
 '作成者 5345kk'
 @startuml
   actor DataServer
+<<<<<<< HEAD
   package Viewer{
         usecase 結果を表示する as result
   }
@@ -9,6 +10,14 @@
 DataServer<-result
 参加者->result
 管理者.参加者
+=======
+  rectangle Viewer{
+        usecase 結果を表示する
+  }
+
+'Link'
+DataServer->結果を表示する
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 
 
 @enduml

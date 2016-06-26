@@ -1,5 +1,6 @@
 '作成者 5345kk'
 @startuml
+<<<<<<< HEAD
 
 
   database DataServer as Data{
@@ -16,6 +17,14 @@
       }
 
 
+=======
+  actor "参加者"
+
+  rectangle DataServer{
+      usecase 戦績
+      usecase スコア
+      usecase プレーヤー名
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 
 
 
@@ -23,6 +32,7 @@
   }
 
 'link'
+<<<<<<< HEAD
 JoinServer<-pinfo
 GameServer<-info
 Printer->Data
@@ -30,4 +40,13 @@ Viewer->Data
 
 '関連付け'
 
+=======
+参加者->プレーヤー名
+GameServer->スコア
+戦績->Printer
+
+'関連付け'
+スコア.>戦績
+プレーヤー名.>戦績
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 @enduml

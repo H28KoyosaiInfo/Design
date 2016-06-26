@@ -3,6 +3,7 @@
   actor DataServer
   actor Player
   actor Admin
+<<<<<<< HEAD
   package GameServer{
     rectangle GameInformation as info{
       usecase ヒット数
@@ -10,6 +11,12 @@
       usecase アイテム
     }
 
+=======
+  rectangle GameServer{
+      usecase ヒット数
+      usecase 体力
+      usecase アイテム
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
       usecase 当たり判定
       usecase ゲーム進行指示
 
@@ -20,6 +27,7 @@
   }
 
 'link'
+<<<<<<< HEAD
 Player<-info
 
 Player->当たり判定
@@ -31,6 +39,22 @@ Admin<-ゲーム進行指示
 
 
 
+=======
+Player->ヒット数
+Player->体力
+Player->アイテム
+Player->当たり判定
+
+ヒット数->DataServer
+ヒット数->Viewer
+体力->Viewer
+
+Admin->ゲーム進行指示
+ゲーム進行指示->Player
+
+
+体力->Player
+>>>>>>> a3b20bdf2dcb62e4dd00085957cbd01f6b5cec28
 当たり判定->Player
 
 @enduml
