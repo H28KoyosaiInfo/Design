@@ -1,0 +1,39 @@
+'作成者　Shoyamamura'
+@startuml
+title <size:18> Fig.Class_Admin
+
+  package Admin{
+    class "Solved Troble"{
+      debug()
+    }
+
+    class "Penalty"{
+      #int penaltyPattern
+      sentPenalty()
+    }
+
+    class "Mission Priod"{
+      #int missioPattern
+      startMissionCue()
+    }
+
+    class "Game Priod"{
+      startGameCue()
+      endGameCue()
+    }
+
+    interface "StopGame"{
+    }
+
+    "StopGame" <|.. "Game Priod"
+    "StopGame" <|.. "Solved Troble"
+    "StopGame" <|.. "Penalty"
+    "StopGame" <|.. "Mission Priod"
+
+  }
+
+  package GameServer <<node>>{
+  }
+  Admin -down-> GameServer : <<SIGNAL>>
+
+@enduml

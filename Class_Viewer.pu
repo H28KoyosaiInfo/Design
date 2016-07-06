@@ -1,0 +1,16 @@
+'作成者 Shoyamamura'
+@startuml
+title <size:18> Fig.Class_Viewer
+  package Viewer{
+    class Display{
+      #int displayOn
+      displayTern()
+      displayResult(displayOn)
+    }
+  }
+
+  package "DataServer" <<node>>{
+  }
+
+  Viewer <-> DataServer : <<GAMEDATA>>
+@enduml

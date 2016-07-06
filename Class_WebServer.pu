@@ -1,0 +1,21 @@
+'作成者 Shoyamamura'
+@startuml
+title <size:18> Fig.Class_WebServer
+
+  package "WebServer"{
+    class Browser{
+      #string playerId[]
+      #int score[]
+      #int playerNum
+
+      getGameState(&playerId[],&score[])
+      htmlCreate(playerId[],score[],playerNum)
+    }
+  }
+
+  package "DataServer" <<node>>{
+  }
+
+  WebServer <-> DataServer
+
+@enduml
