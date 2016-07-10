@@ -2,19 +2,34 @@
 @startuml
 title <size:18> Fig.Class_Admin
 
+  'actor Administrator
+  class Administrator << (U,violet) >>
+
   package Admin{
+
+    class "Get Command" {
+      -int commandPattern
+      doCommand(commandPattern)
+    }
+
     class "Solved Troble"{
       debug()
     }
 
     class "Penalty"{
-      #int penaltyPattern
+      -int penaltyPattern
       sentPenalty()
     }
 
+    class "Type Penalty"{
+    }
+
     class "Mission Priod"{
-      #int missioPattern
+      -int missioPattern
       startMissionCue()
+    }
+
+    class "Type Mission"{
     }
 
     class "Game Priod"{
@@ -22,18 +37,31 @@ title <size:18> Fig.Class_Admin
       endGameCue()
     }
 
-    interface "StopGame"{
+    class "Send Operation"{
+      -int operationPattern
+      operationToGameServer(operationPattern)
     }
 
-    "StopGame" <|.. "Game Priod"
-    "StopGame" <|.. "Solved Troble"
-    "StopGame" <|.. "Penalty"
-    "StopGame" <|.. "Mission Priod"
+    "Penalty" "1"*--"1..*" "Type Penalty"
+    "Mission Priod" "1"*--"1..*" "Type Mission"
+
+    "Send Operation" <|.down. "Game Priod"
+    "Send Operation" <|.down. "Solved Troble"
+    "Send Operation" <|.down. "Penalty"
+    "Send Operation" <|.down. "Mission Priod"
+
+    "Get Command" -down- "Game Priod"
+    "Get Command" -down- "Solved Troble"
+    "Get Command" -down- "Penalty"
+    "Get Command" -down- "Mission Priod"
 
   }
 
   package GameServer <<node>>{
   }
-  Admin -down-> GameServer : <<SIGNAL>>
+
+  Administrator --> "Get Command"
+
+  "Send Operation" "1..*"-down->"1" GameServer : <<Operation>>
 
 @enduml

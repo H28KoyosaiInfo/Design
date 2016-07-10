@@ -1,0 +1,34 @@
+'作成者 Shoyamamura'
+'webserver と統合'
+@startuml
+title <size:18> Fig.Class_Viewer & WebServer
+
+  package Web&Viewer{
+
+    package Viewer{
+      class "Display"{
+        -int displayOn
+
+        'displayTurn()  '画面切り替えor更新??'
+        displayResult(displayOn)
+      }
+    }
+
+    package "WebServer"{
+      class Browser{
+        -string playerId
+        #int score
+
+        getGameState(playerId)  '欲しいId'
+        htmlCreate(playerId)
+      }
+    }
+
+  }
+
+  package "DataServer" <<node>>{
+  }
+
+  Browser <-> DataServer : <<by_getGameState(playerId&score)>>
+  Browser --> Display : <<by_htmlCreate(playerId&score)>>
+@enduml
