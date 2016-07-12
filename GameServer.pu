@@ -1,36 +1,54 @@
 '作成者 5345kk'
 @startuml
-  actor DataServer
-  actor Player
-  actor Admin
-  package GameServer{
-    rectangle GameInformation as info{
-      usecase ヒット数
-      usecase 体力
-      usecase アイテム
-    }
 
-      usecase 当たり判定
-      usecase ゲーム進行指示
+class GAMESERVER{
+  allPlayerId
+  infoOfState
 
+  getState()
+  retentionState()
+  getDate() '終了時にのみ'
+  sendDate()
 
+}
+package Player{
+  Class DATE{
 
+  }
+  Class SCORE{
 
+  }
+  Class HITPOINT{
+
+  }
+  Class ITEM{
+
+  }
+  Class IP{
 
   }
 
-'link'
-Player<-info
+}
+Class DATESERVER{
+  Date
 
-Player->当たり判定
-
-DataServer->info
-
-Admin<-ゲーム進行指示
-ゲーム進行指示<-Player
+  getDate()
 
 
+}
 
-当たり判定->Player
+Class ADMIN{
+  State
+
+  sendState()
+}
+
+GAMESERVER -up- DATE
+DATE -down- SCORE
+DATE -down- HITPOINT
+DATE -down- ITEM
+GAMESERVER - IP
+ADMIN - GAMESERVER
+DATESERVER - GAMESERVER
 
 @enduml

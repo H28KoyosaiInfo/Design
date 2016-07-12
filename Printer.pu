@@ -1,17 +1,36 @@
 '作成者 5345kk'
 @startuml
-  actor DataServer
 
-  package Printer{
-      usecase 戦績を印刷 as print
+class Printer{
+  Paper
+  Ink
 
+  resultPrint()
+  getTranslationDate() '解析したデータを受け取る'
+}
+class Reader{
+translationDate()
+getDate() '生成したデータを受け取る'
+}
 
+class "CreateDate?(Yamamura)" {
 
+}
+class Player{
+ID
 
-  }
+getResult()
+}
+
+class "ParsonofPrint"{
+  pushButton() '印刷期のボタンを押す'
+
+}
 
 'link'
-DataServer<-print
-print->印刷する人
-print<-参加者
+Printer - Reader
+Reader - "CreateDate?(Yamamura)"
+Printer -down- Player
+Printer -up- "ParsonofPrint"
+
 @enduml
