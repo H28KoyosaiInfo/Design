@@ -5,9 +5,19 @@ title <size:18> Fig.Class_Viewer & WebServer
 
   package Web&Viewer{
 
+    package Receiver{
+      class ReceiveGameData{
+        -tuple<string, int, string> = player(Id, score,nextId)
+
+        getGameState(player)
+        sendGameData(player)
+      }
+    }
+
     package Viewer{
       class "Display"{
         -int displayOn
+        -tuple<string, int, string> = player(Id, score,nextId)
 
         'displayTurn()  '画面切り替えor更新??'
         displayResult(displayOn)
@@ -15,12 +25,13 @@ title <size:18> Fig.Class_Viewer & WebServer
     }
 
     package "WebServer"{
-      class Browser{
-        -string playerId
-        #int score
 
-        getGameState(playerId)  '欲しいId'
-        htmlCreate(playerId)
+      class Browser{
+      'タプルや構造体を用いる'
+        -tuple<string, int, string> = player(Id, score,nextId)
+
+        Browser(player)
+        htmlCreate(player)
       }
     }
 
@@ -29,6 +40,9 @@ title <size:18> Fig.Class_Viewer & WebServer
   package "DataServer" <<node>>{
   }
 
-  Browser <-> DataServer : <<by_getGameState(playerId&score)>>
-  Browser --> Display : <<by_htmlCreate(playerId&score)>>
+  ReceiveGameData -> Browser
+  ReceiveGameData -> Display
+  ReceiveGameData -> Printer
+  ReceiveGameData <-down-> DataServer : __<<by_getGameState(playerId&score)>>
+  Browser -right-> Display : <<by_htmlCreate(playerId&score)>>
 @enduml
