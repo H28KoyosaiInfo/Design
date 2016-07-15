@@ -1,0 +1,47 @@
+'作成者 Shoyamamura'
+'webserver と統合'
+@startuml
+title <size:18> Fig.Class_Viewer & WebServer
+
+  package Web&Viewer{
+
+    package Receiver{
+      class ReceiveGameData{
+        -tuple<string, int, string> = player(Id, score,nextId)
+
+        getGameState(player)
+        sendGameData(player)
+      }
+    }
+
+    package Viewer{
+      class "Display"{
+        -int displayOn
+        -tuple<string, int, string> = player(Id, score,nextId)
+
+        'displayTurn()  '画面切り替えor更新??'
+        displayResult(displayOn)
+      }
+    }
+
+''    package "WebServer"{
+
+''      class Browser{
+      'タプルや構造体を用いる'
+''        -tuple<string, int, string> = player(Id, score,nextId)
+
+''        Browser(player)
+''        htmlCreate(player)
+''      }
+''    }
+''  }
+
+  package "DataServer" <<node>>{
+  }
+
+''  ReceiveGameData -> Browser
+  ReceiveGameData -> Display
+  ReceiveGameData -> Printer
+  ReceiveGameData <-down-> DataServer : <<by_getGameState(playerId&score)>>
+''  Browser -right-> Display : <<by_htmlCreate(playerId&score)>>
+@enduml
