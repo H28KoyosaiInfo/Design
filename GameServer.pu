@@ -1,54 +1,66 @@
 '作成者 5345kk'
 @startuml
 
-class GAMESERVER{
-  allPlayerId
-  infoOfState
-
-  getState()
-  retentionState()
-  getDate() '終了時にのみ'
-  sendDate()
-
-}
-package Player{
-  Class DATE{
-
+Package Gameserver{
+  Class Manage{
+    +void gameStart()
+    +void gamePeriod()
+    +void request(int playerID)
+    +void changeMission(int missionID)
+    +void penalty(int playerID,int mode)
   }
-  Class SCORE{
+  note left:メッセに応じて実行する
 
+  Class Penalty{
+    +void hit(int playerID)
+    +void beHit(int playerID)
+    +void hpZero(int playerID)
+    +void changeStatus(int playerID)
+    +void score(int playerID)
   }
-  Class HITPOINT{
+  note left:罰を含めた状態変化をペナルティとする
 
+  Class Message{
+    +void recieveMes()
+    +void sendMes(Status)
   }
-  Class ITEM{
+  note right:要求を受け取る
 
+  Class Status{
+      +void getStatus(int playerID)
+    }
+    note left:ゲーム終了時にプレイヤーからステータスを回収
+
+  Class Data{
+    +void encodeData(Status)
   }
-  Class IP{
-
-  }
-
-}
-Class DATESERVER{
-  Date
-
-  getDate()
-
-
-}
-
-Class ADMIN{
-  State
-
-  sendState()
+  note right:プレイヤーのデータをSQLに変換して送信する
 }
 
-GAMESERVER -up- DATE
-DATE -down- SCORE
-DATE -down- HITPOINT
-DATE -down- ITEM
-GAMESERVER - IP
-ADMIN - GAMESERVER
-DATESERVER - GAMESERVER
+Package CLIENT <<node>>{
+}
+
+Package PLAYER <<node>>{
+}
+Package DATABASE <<node>>{
+}
+
+'Package Client{
+'}
+
+CLIENT"1"<-->"1"Message
+
+Message<.left>Manage
+Message<.right>Data
+Message"1" <-> "0..*"PLAYER
+
+Status ..>Message
+
+Manage ..>Penalty
+Manage ..up> Status
+
+Penalty ..> Message
+
+Data"1"<->"1"DATABASE
 
 @enduml
