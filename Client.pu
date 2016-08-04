@@ -1,0 +1,65 @@
+'作成者　ShoYamamura'
+'Inprovement UseCase_Admin'
+
+@startuml
+  actor Operator
+  actor Reader
+  actor Printer
+  'Shell方式,命令は非同期'
+  actor GameServer
+
+  package Client{
+    usecase "命令受け取りandCheck管理者"
+    usecase "SendToGameServer"
+    note left : Shellを蓄え
+    usecase "履歴"
+
+    package Game{
+      rectangle Error{
+        usecase "トラブル対処"
+        usecase "ペナルティ付加"
+      }
+      rectangle Priod{
+        usecase "ゲームの区切り"
+        usecase "ミッションの区切りand種類"
+      }
+      usecase "Game命令送信"
+    }
+
+    package BarCodeReader{
+      usecase "バーコード読み取り"
+      usecase "デコードandCheck"
+      usecase "Player情報送信"
+    }
+
+    package Print{
+      usecase "Game情報取得"
+      usecase "情報加工andCheck"
+      usecase "Game情報送信"
+    }
+  }
+
+
+    Operator --> 命令受け取りandCheck管理者
+    命令受け取りandCheck管理者 -> 履歴
+
+    命令受け取りandCheck管理者 --> Print
+    Game情報取得 <--> GameServer
+    Game情報取得 -> 情報加工andCheck
+    情報加工andCheck -> Game情報送信
+    Game情報送信 -> Printer
+
+    命令受け取りandCheck管理者 --> Game
+    Priod -> Game命令送信
+    Error -> Game命令送信
+    Game命令送信 --> SendToGameServer
+
+    Reader --> バーコード読み取り
+    バーコード読み取り -> デコードandCheck
+    デコードandCheck -> Player情報送信
+    Player情報送信 --> SendToGameServer
+
+    SendToGameServer -> 履歴
+    SendToGameServer -> GameServer
+
+@enduml

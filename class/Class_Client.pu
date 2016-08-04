@@ -1,0 +1,218 @@
+'作成者　Shoyamamura'
+@startuml
+title <size:18> Fig.Class_Client
+
+  'actor Administrator
+  class Operator << (U,violet) >>
+  note right : get,set -> property ??
+
+  package GameServer <<node>>{
+  }
+  package Display <<node>>{
+  }
+  package Printer <<node>>{
+  }
+  package Reader <<node>>{
+  }
+
+  class "SendCommand"{
+    list<control*> mControl
+    <GUI>
+    listbox_Player[8]
+    listbox_Print[8]
+    button_Print
+    button_DispNowAndResult
+    button_DispTop10
+    textbox_Admin
+    button_AdminCheck
+    button_GameStart
+    button_GameEnd
+    button_GameStop
+    listbox_Mission[*]
+    button_MissionStart
+    listbox_Penalty[*]
+    button_PenaltySend
+
+    get()
+    set()
+  }
+  note right : CUI(コマンド入力) or GUI(Pushボタン_コマンド生成), Print and Game(Admin_only) operation
+
+  class "Log"{
+    -int ipAddress
+    open(ipAddress)
+    close(ipAddress)
+    add(ipAddress)
+  }
+
+  package MainClient{
+
+    package Game{
+      class "SendGameCommand" {
+        list<control*> gControl
+        get()
+        set()
+      }
+      note left : GameServerに送信する命令のデコーダのようなもの
+
+      interface "Type"{
+      }
+
+      class "SolvedTroble"{
+        SolvedTroble(stopIO)
+      }
+
+      class "Penalty"{
+        -int penaltyPattern
+        -int playerId
+        Penalty(penaltyPattern,playerId)
+''        sendPenalty()
+      }
+
+/'
+      class "TypePenalty"{
+        -int type
+        TypePenalty(type)
+        get()
+      }
+      note right : sendPenalty(<variable>.get())
+'/
+
+      interface "Cue"{
+      }
+
+      class "MissionPriod"{
+        -int missionPattern
+        MissionPriod(missionPattern)
+        startMissionCue()
+      }
+
+/'
+      class "TypeMission"{
+        -int type
+        TypeMission(type)
+        get()
+      }
+      note right : startMissionCue(<variable>.get())
+'/
+
+      class "GamePriod"{
+        -int cue
+        GamePriod(cue)
+        startGameCue()
+        endGameCue()
+      }
+
+      interface "SendOperation"{
+        -int operationPattern
+        sendOperation()
+      }
+      note right : CueやType以下で生成した命令を送信するためのもの
+
+''      "Penalty" "1"*--"1..*" "TypePenalty"
+''      "MissionPriod" "1"*--"1..*" "TypeMission"
+
+      "SendOperation" <|.down. "GamePriod"
+      "SendOperation" <|.down. "SolvedTroble"
+      "SendOperation" <|.down. "Penalty"
+      "SendOperation" <|.down. "MissionPriod"
+
+      "SendGameCommand" -down-> "Cue"
+      "SendGameCommand" -down-> "Type"
+
+      "Cue" -down- "SolvedTroble"
+      "Type" -down- "Penalty"
+      "Type" -down- "MissionPriod"
+      "Cue" -down- "GamePriod"
+    }
+
+    package Print{
+      package Receiver{
+        interface "SendData"{
+          list<player*> mPlayer
+          ''-tuple<string, int, string> = player(Id, score,nextId
+          -boolean viewerOn
+          -boolean printerOn
+          -int viewerPattern
+          getGameState(mPlayer)
+          sendGameData(mPlayer)
+        }
+        note right : TrimViewer(viewerOn) and PrintDesign(printerOn = 1)
+
+        class "DataSocket"{
+          -int address
+          open(address)
+          close(address)
+        }
+        note right : receive GameData from GameServer
+      }
+
+      class "TrimViewer"{
+      }
+      note right : ディスプレイに表示させる加工クラス,viewと統合(?)
+
+      class "PrintDesign"{
+      }
+      note right : プリントするための加工クラス,viewと統合(?)
+
+      class "ViewDisplay"{
+        -tuple<string, int, string> = player<Id, score,nextId>
+        displayResult()
+      }
+
+      class "ViewPrinter"{
+        printerResult()
+      }
+
+      "SendCommand" --> Receiver
+      "SendData" <|.. "DataSocket"
+      "DataSocket" -down-> "PrintDesign"
+      "DataSocket" -down-> "TrimViewer"
+      "PrintDesign" --> "ViewPrinter"
+      "TrimViewer" --> "ViewDisplay"
+      "ViewPrinter" --> Printer
+      "ViewDisplay" --> Display
+      "DataSocket" <-left-> GameServer
+    }
+
+    package BarCodeReader{
+      class "PlayerInfoSocket"{
+        -int barcodeValue
+        get()
+        set()
+        decode()
+      }
+
+      interface "SendPlayerInfo"{
+        -int playerInfo
+        getPlayerInfo()
+      }
+
+      Reader --> BarCodeReader
+      "SendPlayerInfo" <|.. "PlayerInfoSocket"
+    }
+    note right : 無理なら作らない
+
+    class "SendToGameServer"{
+      open(ipAddress)
+      close(ipAddress)
+      ipAddress
+    }
+    note right : Shell蓄え
+
+  }
+
+  package GameServer <<node>>{
+  }
+
+  Operator --> "SendCommand"
+  "SendCommand" --> "SendGameCommand"
+
+  "PlayerInfoSocket" "1..8"-->"1" "SendToGameServer"
+  "SendOperation" "1..*"-right->"1" "SendToGameServer" : <<Operation>>
+  "SendToGameServer" -> GameServer : <<Shell方式>>
+
+  "SendCommand" --> "Log"
+  "SendToGameServer" --> "Log"
+
+@enduml
