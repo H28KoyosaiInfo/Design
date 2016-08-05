@@ -1,0 +1,470 @@
+@startuml
+' package and class defs
+
+
+package Player{
+
+
+
+    'Direct User Interface'
+    package DUI{
+
+        class Color<<"extern library">>{
+            uint8_t r,g,b;
+        }
+
+        class AnimateColor{
+            -int pos;
+            -vector<Color>* m_Color;
+            +AnimateColor(const vector<Color>& lst);
+            +Color Generate();
+            +Change(const vector<Color>& lst);
+        }
+        AnimateColor -.>Color
+
+        class GPIO<<extern library>>{
+            +void change(mode);
+            +void Write(bool);
+            +bool Read();
+        }
+
+        class AnimateGPIO{
+            -GPIO pin;
+            +writeonly vector<bool> Rhythm;
+            -int position;
+            +AnimateGPIO(vector<bool> rhythm);
+        }
+        AnimateGPIO -.>GPIO:use;
+
+        class Vibration{
+            -Vibration();
+            -operator new();
+            -static Vibration;
+            +static Vibration* GetInstance();
+        }
+        note top of Vibration :"単一インスタンスである"
+        Vibration -|>AnimateGPIO
+
+        class TriggerInput{
+            -TriggerInput();
+            -operator new()=delete;
+            -static Vibration;
+            +static Vibration* GetInstance();
+        }
+        note top of TriggerInput:"単一インスタンスである"
+        TriggerInput -|>GPIO
+
+        class LEDArray{
+            +writeonly vector<AnimateColor> Anime;
+            +LEDArray(const vector<AnimateColor>&);
+            -GPIO[] BUS;
+            +void Generate();
+        }
+        LEDArray-.>AnimateColor
+
+        handle_t -- int:same
+
+        class Sound{
+            -Sound()=delete;
+            -operator new()=delete;//生成禁止
+            -static Sound m_Sound;
+            +static Sound* GetInstance();
+            -GPIO[] pins:???;
+            -MenSound[] sounds;
+            -handle_t Load(string FileName):"メモリー上にサウンドを展開";
+            -Unload(handle_t);
+            -Run(handle_t);
+        }
+        note top of Sound:"単一インスタンス"
+        note top of Sound:"適時変更してください"
+
+        class Graphics{
+            -あるものと仮定する-
+        }
+
+        class LCD<<"extern library">>{
+            -GPIO[];
+            ~略~
+        }
+        LCD-|>Graphics
+
+        class Touch{
+            -Touch();
+            -operator Touch* new()=delete;
+            +static Touch* GetInstance();
+            +bool IsTouch();
+            +readonly Point Location;
+        }
+        note right of Touch:"単一インスタンスである"
+
+        class WebCam{
+            -USB m_usb;
+            +Image Shot();
+            +Camera(Rectangle);
+            +~Camera();
+        }
+        note right of WebCam :"触れたことがないのでそれっぽく書いています、適時修正してください"
+
+        class PlayerID{
+            +int id;
+            +operator(string);
+            PlayerID(int);
+            PlayerID(string);
+        }
+
+        class ItemID{
+            +int id;
+            +operator(string);
+            +ItemID(int);
+            +ItemID(string);
+        }
+
+        class ScanCamera{
+            -WebCam m_Camera;
+            +readonly Image Photo;
+            +static const float ReferenceSimilary;
+            +readonly float Similary:"類似度、もしもなければ消す";
+            +readonly Rectangle? Target:"対象の位置、もしも対象がいないならnullが返る";
+            +readonly PlayerID? IsHitPlayer:"判別、もしも対象がいないならnullが返る";
+            +readonly ItemID? IsHitItem;
+            +ScanningCamera(const Camera&);
+            +void Scan():"ここでカメラ画像を取得、認識する。";
+        }
+        ScanCamera-.>WebCam:use;
+
+    }
+    'ゲームサーバーから文字列を処理するシェル'
+    package GShell{
+        interface IShell{
+            +bool Cheak(string)=0;
+            +int Run(string[])=0;
+        }
+
+
+
+        class ShellBegin {
+            +static const string cmp="begin";
+            +bool Cheak(string);
+            +int Run(string[]);
+        }
+        ShellBegin -up-|>IShell
+        note right of ShellBegin:ゲームの開始時
+
+        class ShellEnd{
+            +static const string cmp="end";
+            +bool Cheak(string);
+            +int Run(string[]);
+        }
+        ShellEnd -up-|>IShell
+
+        class ShellHalt{
+            +static const string cmp="halt";
+            +bool Cheak(string);
+            +int Run(string[]);
+        }
+        ShellHalt-up-|>IShell
+
+        class ShellStatus{
+            +static const string cmp="status";
+            +bool Cheak(string);
+            +int Run(string[]);
+        }
+        'note up of ShellStatus:"終了時等に状態を会得する際に用いられる。"
+        ShellStatus-up-|>IShell
+
+        class ShellHit{
+            +static const string cmp="hit"
+            +bool Cheak(string);
+            +int Run(string[]);
+        }
+        ShellHit-up-|>IShell
+
+        class ShellMission{
+            +static const string cmp="mission"
+            +bool Cheak(string):
+            +int Run(string[]);
+        }
+        ShellMission-up-|>IShell
+        ShellMission->BMission:use
+
+
+        class ShellGetPoint{
+            +static const string cmp="GP";
+            +bool Cheak(string);
+            +int Run(string[]);
+        }
+        ShellGetPoint-up-|>IShell
+
+        'Cのあれ'
+        class IFile<<"extern library">>{
+            scanf(),printf(),etc...;
+        }
+        note right of IFile:StdLibraryのFStreamが実際には用いられる。
+
+        class CommandDecoder{
+            -list<IShell*> m_Shells;
+            +CommandList(ICollection<IShell>* lst=null);
+            +Run(IFile*):"末尾まで実行する"
+            +Book(IShell*);
+        }
+        CommandDecoder-.>IShell:use
+        CommandDecoder-.>IFile:use
+
+        class IPAddress<<"extern library">>{
+            +byte[4] address;
+        }
+
+        interface IEncoder{
+            +string Write();
+        }
+
+        class HitEncoder{
+            +const string keyword="hit";
+            -PlayerID m_id;
+            -long score;
+            +HitEncoder(PlayerID,long Damege);
+            +string Write()const;
+        }
+        HitEncoder -|>IEncoder
+
+        class GetItemEncoder{
+            +const string keyword="item";
+            -ItemID m_id;
+            +GetItemEncoder(ItemID);
+            +string Write()const;
+        }
+        GetItemEncoder -|>IEncoder
+
+        class ResultEncoder{
+            +const string keyword="rsl";
+            +stirng Write()const;
+        }
+        ResultEncoder-|>IEncoder
+
+        class CommandEncoder{
+            -queue<ILineEncoder*> m_Lines;
+            +void Push(IEncoder*);
+            +IFile* Write();
+        }
+        CommandEncoder-.>IEncoder:use
+        CommandEncoder-.>IFile:use
+
+        class NetSocket{
+            +readonly IPAddress_t IPAddress;
+            +readonly int DeviceID:"GameServerでの識別番号";
+            +Socket(string DeviceID);
+            +~Socket();
+            +bool Open(IPAddress_t);
+            +bool Close();
+            +IFile* ReadFile();
+            +int WriteFile(IFile*);
+        }
+        NetSocket -.>IFile<<"extern library">>:use
+    }
+    'Game Action'
+    package GAction{
+        'Model'
+        class Judge{
+            -static Judge;
+            +static Judge* GetInstance();
+            +Property string UserName;
+            +Property int AttackPower,DefancePower,Point;
+            +Property bool Invincible:"ダメージカウントを無効化";
+            +Property double BonusPoint:"会得する得点の倍率";
+            +Property Gun GunType:"銃の種類":"時間がかかると思われるので非実装も考える。";
+            +Property double reload,reload_now:"リロード時間"
+
+            void Run();
+            +tuple<PLayerID,int score>? Hit():"銃が発射されたかどうかまた当たったかどうか";
+            +tuple<ItemID>? Item():"アイテムを取得したか確認する。";
+
+            +string WriteLog()；
+        }
+        note top of Judge:"単一インスタンスである"
+        Judge -*ScanCamera
+        Judge -*TriggerInput
+        Judge -.>IEncoder
+        Judge -.>NetSocket
+
+        class BMission{
+            -readonly uint LimitTime:"ミッションの有効期限[ms]";
+            -readonly int code:"識別用";
+            +bool Count():"有効期限をカウントダウンする";
+            +BMission(uint limit):"特殊効果を設定する";
+            +~BMission():"特殊効果を解除する";
+            +int reload():"リロード時間"
+            +Effect():"特殊効果を実行する。";
+        }
+        BMission =>Judge:use
+
+        class MissionBonus{
+            -double bonus;
+            +BonusMission(uint limit,double bonus);
+            +~BonusMission();
+        }
+        MissionBonus --|>BMission
+
+        class MissionAttack{
+            -double attack_rate;
+            +BonusMission(uint limit,double rate);
+            +~BonusMission();
+        }
+        MissionAttack--|>BMission
+
+        class MissionDefance{
+            -double defance_rate;
+            +DefanceMission(uint limit,double rate);
+            +DefanceMission();
+        }
+        MissionDefance--|>BMission
+
+        class MissionPointRate{
+            +PointMission(uint limit,double rate):"現在のポイントをrate倍する"
+        }
+        MissionPointRate--|>BMission
+
+        class MissionChangeGun{
+            -guntype swap;
+            +MissionChangeGun(uint limit,guntype);
+            +~MissionChangeGun();
+        }
+        MissionChangeGun--|>BMission
+
+        class MissionReload{
+            -double rate;
+            +MissionReload(uint limit,double rate);
+            +~MissionReload();
+        }
+        MissionReload--|>BMission
+
+        class BoardMission{
+            -list<BMission*> lstMissions;
+            +void Add(BMission*);
+            +void Remove(int code;)
+            +void Effect():"現在のミッションをすべて実行し有効期限が切れていたら消す";
+        }
+        BoardMission-.>BMission
+
+    }
+
+    package GUI{
+        'ここでいうControlはForm上に存在するコントロールのことを指す。'
+        'つまりMVCのControlではないことに注意してほしい。'
+        'あと必ずこの種のライブラリは存在するので探してそれを使うこと!!というか.netのパクリです。'
+        package Controls {
+            class Control{
+                +readonly Rectangle m_rectangle:"描画できる座標";
+                +Property int Z:"この値をもとに描画する順番が整列される。";
+                +readonly int Code:"識別コード";
+                +SortedArray<Control*> Children;
+                bool operator > (const Control&)const;
+                #Control* Parent;
+                #int SendEvent(int code,void*);
+                #int ReceviceEvent(void*);
+                +void Refresh();
+                #void Paint(Graphics*):"自Control向け"
+            }
+            note bottom of Control:"既存のコントロールをできれば流用する。"
+            note right of Control :"一は全、全は一"
+            Control-->Control
+
+            interface ITimerControl{
+                #Int division,now:"これで強制的に分周する";
+                +Void Clock():定期的に呼び出される;
+                #Void TimerEvent()=0;
+            }
+            note right of ITimerControl:"既存のライブラリにあればそれを流用"
+
+            '銃の状態を表示'
+            class TriggerControl{
+                -GPIO trigger:"銃のリミットスイッチ";
+                -Vector<Image*> lstNum:"絵数字[リロード時間]";
+                +Paint(Graphics*);
+                +void TimerEvent();
+            }
+            note top of TriggerControl:"銃の状態を表示するだけのコントローラである。つまり発砲に伴う処理は行わない"
+            TriggerControl --|>Control
+            TriggerControl --*Judge
+
+            'ミッション状態を表示'
+            class MissionControl{
+                -Vector<Image*> lstMark:"各ミッションのイメージを保存しておく";
+                +Void Paint();
+                +Readonly int Z = 100:"前のほうに配置";
+            }
+            MissionControl--|>Control
+            MissionControl-.*Judge:参照
+
+            '得点状況を表示'
+            class PointControl{
+                -Vector<Image*> m_lstNum:"絵数字";
+                -Image m_Buffer;
+                +Readonly int Z = 101:"前のほうに配置";
+                +Void Paint(Graphics*);
+            }
+            PointControl--|>Control
+            PointControl-.*Judge:参照
+
+            'MessageBox的なもの'
+            class HopMessage{
+                -String m_message;
+                -Image m_buffer:"毎回描画するのは非常に時間がかかるよって描画結果をここに保存する";
+                +Readonly int Z =200;
+                +HopMessage(const string&);
+                +void Write(cosnt string&);
+                +void Paint(Graphics);
+            }
+            HopMessage-|>Control
+            note right of HopMessage :"ユーザーに対しての一時的にメッセージを表示するときに用いる"
+
+            'Webカメラからイメージを表示する'
+            class WebCamControl{
+                -ScanCamera m_cam;
+                +Writeonly Color BorderColor:"対象の囲う四角の色";
+                +Readonly Int Z = 0:"もっとも奥に入れる";
+                +Void Paint(Graphics*);
+                +Int? Judge();
+                +Void TimerEvent();
+            }
+            note top of WebCamControl:"銃の射程及び発射をおこなう"
+            WebCamControl-|>ITimerControl
+            WebCamControl--|>Control
+            WebCamControl--*ScanCamera
+            WebCamControl--*TriggerInput
+
+            'ネットワークとの接続状況を表示し主に受信処理を行う。'
+            class ConnectControl{
+                -NetSocket socket;
+                -CommandDecoder decoder;
+                -Vector<Image*> statusConnect:"接続状況の表示";
+                +readonly int Z = 102:"前のほうに配置";
+                +Void Paint(Graphics*);
+                +ConnectControl():"ソケットをつなげること。"
+                +~ConnectControl():"ソケットを切る。"
+                +Write(string);
+                +Void TimerEvent():"受信確認"；
+            }
+            note right of ConnectControl :"接続状況とShellを実行する。"
+            ConnectControl --|>ITimerControl
+            ConnectControl --|>Control
+            ConnectControl -.>NetSocket
+            ConnectControl -.*CommandDecoder
+        }
+
+        class Window{
+            -Vector<ITimerControl*> lstTimer;
+            -ConnectControl connect:なおItemに登録もされている。
+
+            void TimerEvent();
+            -readonly Parent=null:"なぜならrootだからだ!!";
+            +void Paint(Graphics*);
+
+        }
+        Window--|>Control
+        Window-.>Graphics
+        Window-*Judge
+        Window-*Touch
+
+    }
+}
+@enduml
