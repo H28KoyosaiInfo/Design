@@ -20,16 +20,20 @@ Package Gameserver{
   }
   note left:罰を含めた状態変化をペナルティとする
 
-  Class Message{
+  Class Rmessage{
     +void recieveMes()
-    +void sendMes(Status)
+    +void decodeMes()
   }
   note right:要求を受け取る
 
+  Class Smessage{
+    +void sendMes(Status)
+  }
+
   Class Status{
-      +void getStatus(int playerID)
-    }
-    note left:ゲーム終了時にプレイヤーからステータスを回収
+    +void getStatus(int playerID)
+  }
+  note left:ゲーム終了時にプレイヤーからステータスを回収
 
   Class Data{
     +void encodeData(Status)
@@ -39,27 +43,25 @@ Package Gameserver{
 
 Package CLIENT <<node>>{
 }
-
 Package PLAYER <<node>>{
 }
 Package DATABASE <<node>>{
 }
 
-'Package Client{
-'}
 
-CLIENT"1"<-->"1"Message
 
-Message<.left>Manage
-Message<.right>Data
-Message"1" <-> "0..*"PLAYER
+CLIENT"1"-->"1"Rmessage
 
-Status ..>Message
+Rmessage<.left>Manage
+Smessage<.right>Data
+Smessage"1" <-> "0..*"PLAYER
+
+Status ..>Smessage
 
 Manage ..>Penalty
 Manage ..up> Status
 
-Penalty ..> Message
+Penalty ..> Smessage
 
 Data"1"<->"1"DATABASE
 
